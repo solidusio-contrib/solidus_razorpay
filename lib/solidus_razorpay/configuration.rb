@@ -4,7 +4,7 @@ module SolidusRazorpay
   class Configuration
     # Define here the settings for this extension, e.g.:
     #
-    # attr_accessor :my_setting
+    attr_accessor :razorpay_key, :razorpay_secret, :razorpay_color
   end
 
   class << self

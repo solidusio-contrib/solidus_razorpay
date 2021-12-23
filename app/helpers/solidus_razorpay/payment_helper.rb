@@ -1,0 +1,2 @@
+module SolidusRazorpay::PaymentsHelper
+end

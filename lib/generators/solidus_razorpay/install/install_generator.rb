@@ -10,6 +10,10 @@ module SolidusRazorpay
         template 'initializer.rb', 'config/initializers/solidus_razorpay.rb'
       end
 
+      def mount_engine
+        route "mount SolidusRazorpay::Engine, at: '/solidus_razorpay'"
+      end
+
       def add_javascripts
         append_file 'vendor/assets/javascripts/spree/frontend/all.js', "//= require spree/frontend/solidus_razorpay\n"
         append_file 'vendor/assets/javascripts/spree/backend/all.js', "//= require spree/backend/solidus_razorpay\n"
@@ -32,6 +36,13 @@ module SolidusRazorpay
           puts 'Skipping bin/rails db:migrate, don\'t forget to run it!' # rubocop:disable Rails/Output
         end
       end
+
+      # def add_razorpay_payment_method
+      #   Razorpay::PaymentMethod.new(
+      #     name: 'Razorpay',
+      #     preference_source: "razorpay_credentials"
+      #   ).save
+      # end
     end
   end
 end
