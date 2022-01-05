@@ -2,8 +2,32 @@ require 'razorpay'
 
 class SolidusRazorpay::Gateway
   CURRENCY = Spree::Config.currency
-  RAZORPAY_KEY = SolidusRazorpay.configuration.razorpay_key
-  COLOR = SolidusRazorpay.configuration.razorpay_color
+  RAZORPAY_KEY = SolidusRazorpay.config.razorpay_key
+  COLOR = SolidusRazorpay.config.razorpay_color
+
+  def initialize(options = nil);end
+
+  def authorize(amount, payment_source, gateway_options)
+    payment = gateway_options[:originator]
+    razorpay_payment_id = payment.payment_source.razorpay_payment_id
+    razorpay_payment = retrieve_payment(razorpay_payment_id)
+    ActiveMerchant::Billing::Response.new(true, 'Transaction approved', razorpay_payment.attributes,
+        authorization: razorpay_payment.id)
+    rescue StandardError => e
+      ActiveMerchant::Billing::Response.new(false, e.message, {})
+  end
+
+  def void(gateway_options, options)
+    payment = options[:originator]
+    # razorpay_payment_id = SolidusRazorpay::PaymentSource.find(source_id)
+    razorpay_payment_id = payment.payment_source.razorpay_payment_id
+    razorpay_payment = retrieve_payment(razorpay_payment_id)
+    refund_payment(razorpay_payment) if(razorpay_payment.status == 'captured')
+    ActiveMerchant::Billing::Response.new(true, 'Transaction void', razorpay_payment.attributes,
+        authorization: razorpay_payment.id)
+    rescue StandardError => e
+      ActiveMerchant::Billing::Response.new(false, e.message, {})
+  end
 
   def create_order(amount, receipt_id)
     order = Razorpay::Order.create(amount: amount, currency: CURRENCY, receipt: receipt_id)

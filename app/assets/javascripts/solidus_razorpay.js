@@ -1,6 +1,7 @@
 let key;
 let amount;
 let currency;
+let razorpayOrderId;
 let orderId;
 let receipt;
 let color;
@@ -10,6 +11,9 @@ let email;
 let contactNumber;
 let options;
 let rzpButton;
+let orderToken;
+let paymentSourceId;
+let frontend;
 
 const paymentFailed = (response) => {
   alert(response.error.code);
@@ -22,7 +26,67 @@ const paymentFailed = (response) => {
 };
 
 const createOrder = () => {
-  return fetch('/razorpay_order' + '?receipt=' + receipt + '&amount=' + amount, { method: 'GET' })
+  const body = JSON.stringify({
+    receipt: receipt,
+    amount: amount,
+    orderId: orderId
+  });
+
+  return fetch('/razorpay_order', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      "X-Spree-Order-Token": orderToken
+    },
+    body
+  })
+}
+
+const paymentSuccess = async (data) => {
+  let paymentMethodId;
+  let floatAmount = (Number.parseFloat(amount) * 0.01).toPrecision(4)
+
+  if (frontend) {
+    paymentMethodId = document.querySelector('[name="order[payments_attributes][][payment_method_id]"]:checked').value
+  } else {
+    paymentMethodId = document.querySelector('[name="payment[payment_method_id]"]:checked').value
+  }
+
+  const body = JSON.stringify({
+    order_token: orderToken,
+    payment: {
+      amount: floatAmount,
+      payment_method_id: paymentMethodId,
+      source_attributes: {
+        order_id: orderId,
+        razorpay_order_id: razorpayOrderId,
+        razorpay_payment_id: data.razorpay_payment_id,
+        razorpay_signature: data.razorpay_signature
+      }
+    },
+  });
+
+  return resp = await fetch('/api/checkouts/' + receipt + '/payments', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      "X-Spree-Order-Token": orderToken
+    },
+    body,
+  });
+}
+
+const advanceOrder = async () => {
+  return fetch('/api/checkouts/' + receipt + '/advance', {
+    method: "PUT",
+    headers: {
+      'Content-Type': 'application/json',
+      "X-Spree-Order-Token": orderToken
+    },
+    data: {
+      order_token: orderToken
+    }
+  })
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -38,6 +102,9 @@ document.addEventListener('DOMContentLoaded', () => {
     name = rzpButton.dataset.name;
     email = rzpButton.dataset.email;
     contactNumber = rzpButton.dataset.contactNumber;
+    orderToken = rzpButton.dataset.orderToken;
+    orderId = rzpButton.dataset.orderId;
+    frontend = rzpButton.dataset.frontend
 
     options = {
       "key": key,
@@ -45,12 +112,13 @@ document.addEventListener('DOMContentLoaded', () => {
       "currency": currency,
       "name": storeName,
       "order_id": '',
-      "handler": function (response){
+      "handler": async function (response) {
           // Call Payment API to create payment source for order and update status
-          console.log(response);
-          alert(response.razorpay_payment_id);
-          alert(response.razorpay_order_id);
-          alert(response.razorpay_signature)
+          await paymentSuccess(response);
+          await advanceOrder();
+          if (frontend) {
+            window.location.href = '/checkout/confirm';
+          }
       },
       "prefill": {
           "name": name,
@@ -97,8 +165,10 @@ document.addEventListener('DOMContentLoaded', () => {
       // CAll API to create Razorpay Order
       createOrder()
       .then((resp) => resp.json())
-      .then((response) => response.orderId)
-      .then((orderId) => options.order_id = orderId)
+      .then((response) => {
+        options.order_id = razorpayOrderId = response.razorpayOrderId;
+        paymentSourceId = response.paymentSourceId;
+      })
       .then(() => {
         let rzp1 = new Razorpay(options);
         rzp1.on('payment.failed', (response) => paymentFailed(response));
