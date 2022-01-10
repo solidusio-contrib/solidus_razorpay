@@ -21,7 +21,8 @@ module SolidusRazorpay
       )
 
       app.config.spree.payment_methods << SolidusRazorpay::PaymentMethod
-      Spree::PermittedAttributes.source_attributes.concat [:order_id, :razorpay_order_id, :razorpay_payment_id, :razorpay_signature]
+      Spree::PermittedAttributes.source_attributes.concat [:order_id, :razorpay_order_id, :razorpay_payment_id,
+                                                           :razorpay_signature]
     end
     # use rspec for tests
     config.generators do |g|

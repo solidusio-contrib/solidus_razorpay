@@ -1,13 +1,17 @@
-class SolidusRazorpay::PaymentSource < SolidusSupport.payment_source_parent_class
-  self.table_name = 'solidus_razorpay_payment_sources'
-  belongs_to :order, class_name: 'Spree::Order'
-  belongs_to :payment_method, class_name: 'Spree::PaymentMethod'
-  # validates :order_id, presence: true
+# frozen_string_literal: true
 
-  enum order_status: %i[created attempted paid], _suffix: true
-  enum payment_status: %i[not_started created authorized captured refunded failed], _suffix: true
+module SolidusRazorpay
+  class PaymentSource < SolidusSupport.payment_source_parent_class
+    self.table_name = 'solidus_razorpay_payment_sources'
+    belongs_to :order, class_name: 'Spree::Order'
+    belongs_to :payment_method, class_name: 'Spree::PaymentMethod'
 
-  def receipt
-    order.number
+    enum order_status: { created: 0, attempted: 1, paid: 2 }, _suffix: true
+    enum payment_status: { not_started: 0, created: 1, authorized: 2, captured: 3, refunded: 4, failed: 5 },
+      _suffix: true
+
+    def receipt
+      order.number
+    end
   end
 end

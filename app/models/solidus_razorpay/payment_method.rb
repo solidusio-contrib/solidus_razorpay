@@ -1,17 +1,21 @@
-class SolidusRazorpay::PaymentMethod < SolidusSupport.payment_method_parent_class
-  preference :razorpay_key, :string
-  preference :razorpay_secret, :string
-  preference :razorpay_color, :string
+# frozen_string_literal: true
 
-  def gateway_class
-    ::SolidusRazorpay::Gateway
-  end
+module SolidusRazorpay
+  class PaymentMethod < SolidusSupport.payment_method_parent_class
+    preference :razorpay_key, :string
+    preference :razorpay_secret, :string
+    preference :razorpay_color, :string
 
-  def payment_source_class
-    ::SolidusRazorpay::PaymentSource
-  end
+    def gateway_class
+      ::SolidusRazorpay::Gateway
+    end
 
-  def partial_name
-    "razorpay"
+    def payment_source_class
+      ::SolidusRazorpay::PaymentSource
+    end
+
+    def partial_name
+      "razorpay"
+    end
   end
 end

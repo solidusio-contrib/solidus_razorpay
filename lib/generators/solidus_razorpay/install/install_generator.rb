@@ -36,13 +36,6 @@ module SolidusRazorpay
           puts 'Skipping bin/rails db:migrate, don\'t forget to run it!' # rubocop:disable Rails/Output
         end
       end
-
-      # def add_razorpay_payment_method
-      #   Razorpay::PaymentMethod.new(
-      #     name: 'Razorpay',
-      #     preference_source: "razorpay_credentials"
-      #   ).save
-      # end
     end
   end
 end

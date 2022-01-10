@@ -7,5 +7,4 @@ Spree::Core::Engine.routes.draw do
   # get 'razorpay_complete_checkout', to: '/solidus_razorpay/payment#complete_checkout'
   post 'razorpay_payment', to: '/solidus_razorpay/payment#edit'
   post 'razorpay_order', to: '/solidus_razorpay/order#index'
-
 end
