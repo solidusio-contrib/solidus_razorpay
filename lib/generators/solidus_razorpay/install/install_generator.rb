@@ -6,10 +6,6 @@ module SolidusRazorpay
       class_option :auto_run_migrations, type: :boolean, default: false
       source_root File.expand_path('templates', __dir__)
 
-      def copy_initializer
-        template 'initializer.rb', 'config/initializers/solidus_razorpay.rb'
-      end
-
       def add_javascripts
         append_file 'vendor/assets/javascripts/spree/frontend/all.js', "//= require spree/frontend/solidus_razorpay\n"
         append_file 'vendor/assets/javascripts/spree/backend/all.js', "//= require spree/backend/solidus_razorpay\n"
