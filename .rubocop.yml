@@ -1,5 +1,8 @@
 require:
   - solidus_dev_support/rubocop
 
+RSpec/MultipleMemoizedHelpers:
+  Enabled: false
+
 AllCops:
   NewCops: disable
