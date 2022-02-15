@@ -1,0 +1,15 @@
+<button id="rzp-button1"
+  data-order-id="<%= @order.id %>"
+  data-store-name="<%= @order.store.name %>"
+  data-amount= "<%= @order.display_outstanding_balance.money.fractional %>"
+  data-receipt= "<%= @order.number %>"
+  data-order-token ="<%= @order.guest_token %>"
+  data-name="<%= @order.bill_address.name %>"
+  data-email="<%= @order.email %>"
+  data-contact-number="<%= @order.bill_address.phone %>"
+  data-currency="<%= @order.currency %>"
+  data-frontend="<%= frontend %>"
+>
+  <%= t('razorpay.pay_with_razorpay') %>
+</button>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
