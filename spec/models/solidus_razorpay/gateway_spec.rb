@@ -12,6 +12,7 @@ RSpec.describe SolidusRazorpay::Gateway, type: :model do
     create(:payment, order: order, source_id: payment_source.id, source_type: SolidusRazorpay::PaymentSource,
       payment_method: payment_method, response_code: nil)
   }
+  let(:refund) { create(:refund, transaction_id: payment_source.razorpay_payment_id) }
   let(:gateway) {
     described_class.new({
       razorpay_key: payment_method.preferences[:razorpay_key],
@@ -138,6 +139,36 @@ RSpec.describe SolidusRazorpay::Gateway, type: :model do
       'amount_refunded' => 0,
       'refund_status' => nil,
       'captured' => false,
+      'description' => 'Payment to Stark Industries',
+      'card_id' => 'card_IfyJVazEMj50uH',
+      'email' => 'abcd@gmail.com',
+      'contact' => '+121345678901',
+      'fee' => 3909,
+      'tax' => 0,
+      'error_code' => nil,
+      'error_description' => nil,
+      'error_source' => nil,
+      'error_step' => nil,
+      'error_reason' => nil,
+      'acquirer_data' => { 'auth_code' => '171526' }
+    )
+  }
+
+  let(:razorpay_payment_refunded) {
+    Razorpay::Payment.new(
+      'id' => 'pay_IfyJVYHeAaL6AY',
+      'entity' => 'payment',
+      'amount' => 100,
+      'currency' => 'USD',
+      'base_amount' => 7560,
+      'base_currency' => 'INR',
+      'status' => 'refunded',
+      'order_id' => 'order_IgDqlOTp1beGM',
+      'method' => 'card',
+      'international' => false,
+      'amount_refunded' => 100,
+      'refund_status' => 'full',
+      'captured' => true,
       'description' => 'Payment to Stark Industries',
       'card_id' => 'card_IfyJVazEMj50uH',
       'email' => 'abcd@gmail.com',
@@ -301,6 +332,56 @@ RSpec.describe SolidusRazorpay::Gateway, type: :model do
       it 'raises an error' do
         expect { purchase }.to raise_error 'Razorpay Payment not Authorised'
       end
+    end
+  end
+
+  describe '#void' do
+    subject(:void) { gateway.void(order.number, gateway_options) }
+
+    let(:gateway_options) { { originator: payment } }
+
+    before do
+      payment_source.update(status: 'captured')
+      allow(Razorpay::Payment).to receive(:fetch).and_return(razorpay_payment_refunded)
+      allow(razorpay_payment_refunded).to receive(:refund)
+    end
+
+    it 'returns an ActiveMerchant::Billing::Response' do
+      expect(void).to be_an_instance_of(ActiveMerchant::Billing::Response)
+    end
+
+    it 'returns a successfull ActiveMerchant::Billing::Response' do
+      expect(void.success?).to be true
+    end
+
+    it 'updates the payment source status' do
+      void
+      expect(payment.source.status).to eq razorpay_payment_refunded.status
+    end
+
+    it 'updates the payment source refund_status' do
+      void
+      expect(payment.source.refund_status).to eq razorpay_payment_refunded.refund_status
+    end
+  end
+
+  describe '#credit' do
+    subject(:credit) { gateway.credit(refund.amount, payment_source.razorpay_payment_id, gateway_options) }
+
+    let(:gateway_options) { { originator: refund } }
+
+    before do
+      payment_source.update(status: 'captured')
+      allow(Razorpay::Payment).to receive(:fetch).and_return(razorpay_payment_refunded)
+      allow(razorpay_payment_refunded).to receive(:refund)
+    end
+
+    it 'returns an ActiveMerchant::Billing::Response' do
+      expect(credit).to be_an_instance_of(ActiveMerchant::Billing::Response)
+    end
+
+    it 'returns a successfull ActiveMerchant::Billing::Response' do
+      expect(credit.success?).to be true
     end
   end
 end

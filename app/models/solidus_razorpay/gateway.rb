@@ -45,7 +45,15 @@ module SolidusRazorpay
       )
     end
 
-    def void(order_number, gateway_options); end
+    def void(_order_number, gateway_options)
+      payment = gateway_options[:originator]
+      refund_payment(payment.source, 'Transaction void and refunded')
+    end
+
+    def credit(_amount, razorpay_payment_id, _gateway_options)
+      payment_source = SolidusRazorpay::PaymentSource.find_by(razorpay_payment_id: razorpay_payment_id)
+      refund_payment(payment_source, 'Transaction refunded')
+    end
 
     def purchase(float_amount, _payment_source, gateway_options)
       payment = gateway_options[:originator]
@@ -61,6 +69,20 @@ module SolidusRazorpay
     end
 
     private
+
+    def refund_payment(payment_source, message)
+      raise 'Razorpay Payment not Captured' unless payment_source.status == 'captured'
+
+      retrieve_payment(payment_source.razorpay_payment_id).refund
+      razorpay_payment = retrieve_payment(payment_source.razorpay_payment_id)
+      update_razorpay_source(payment_source, razorpay_payment)
+      ActiveMerchant::Billing::Response.new(
+        true,
+        message,
+        razorpay_payment.attributes,
+        authorization: razorpay_payment.id
+      )
+    end
 
     def verified?(razorpay_payment)
       razorpay_payment.status == 'authorized' || razorpay_payment.status == 'captured'
