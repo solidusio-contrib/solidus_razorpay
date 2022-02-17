@@ -8,7 +8,7 @@ class CreateSolidusRazorpayPaymentSources < ActiveRecord::Migration[6.1]
       t.string :method
       t.string :status
       t.integer :amount_refunded
-      t.integer :refund_status, default: 0
+      t.string :refund_status
       t.boolean :captured
       t.integer :amount
       t.boolean :international

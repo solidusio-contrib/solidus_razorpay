@@ -90,7 +90,6 @@ RSpec.describe SolidusRazorpay::Gateway, type: :model do
       'error_source' => nil,
       'error_step' => nil,
       'error_reason' => nil,
-      'acquirer_data' => { 'auth_code' => '171526' }
     )
   }
 
@@ -127,7 +126,6 @@ RSpec.describe SolidusRazorpay::Gateway, type: :model do
 
     before do
       allow(Razorpay::Payment).to receive(:fetch).and_return(razorpay_payment_authorized)
-      authorize
     end
 
     it 'returns an ActiveMerchant::Billing::Response' do
@@ -136,6 +134,16 @@ RSpec.describe SolidusRazorpay::Gateway, type: :model do
 
     it 'returns a successfull ActiveMerchant::Billing::Response' do
       expect(authorize.success?).to be true
+    end
+
+    it 'updates the payment source status' do
+      authorize
+      expect(payment.source.status).to eq razorpay_payment_authorized.status
+    end
+
+    it 'updates the payment source method' do
+      authorize
+      expect(payment.source.method).to eq razorpay_payment_authorized.method
     end
   end
 end
