@@ -23,11 +23,34 @@ module SolidusRazorpay
       ActiveMerchant::Billing::Response.new(false, e.message, {})
     end
 
-    def capture(float_amount, order_number, gateway_options); end
+    def capture(_float_amount, _order_number, gateway_options)
+      payment = gateway_options[:originator]
+      payment_source = payment.source
+      razorpay_payment = retrieve_payment(payment_source.razorpay_payment_id)
+      raise 'Razorpay Payment not Authorised' unless verified?(razorpay_payment)
+
+      if razorpay_payment.status == 'authorized'
+        razorpay_payment = razorpay_payment.capture({
+          amount: payment_source.amount,
+          currency: payment_source.currency
+        })
+      end
+
+      update_razorpay_source(payment_source, razorpay_payment)
+      ActiveMerchant::Billing::Response.new(
+        true,
+        'Transaction captured',
+        razorpay_payment.attributes,
+        authorization: razorpay_payment.id
+      )
+    end
 
     def void(order_number, gateway_options); end
 
-    def purchase(float_amount, payment_source, gateway_options); end
+    def purchase(float_amount, _payment_source, gateway_options)
+      payment = gateway_options[:originator]
+      capture(float_amount, payment.order.number, gateway_options)
+    end
 
     def create_order(amount, receipt, currency)
       Razorpay::Order.create(amount: amount, currency: currency, receipt: receipt)
@@ -38,6 +61,10 @@ module SolidusRazorpay
     end
 
     private
+
+    def verified?(razorpay_payment)
+      razorpay_payment.status == 'authorized' || razorpay_payment.status == 'captured'
+    end
 
     def update_razorpay_source(payment_source, razorpay_payment)
       payment_source.currency = razorpay_payment.currency
