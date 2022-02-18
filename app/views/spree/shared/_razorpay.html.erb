@@ -9,6 +9,7 @@
   data-contact-number="<%= @order.bill_address.phone %>"
   data-currency="<%= @order.currency %>"
   data-frontend="<%= frontend %>"
+  data-success-callback-path="<%= success_callback_path %>"
 >
   <%= t('razorpay.pay_with_razorpay') %>
 </button>

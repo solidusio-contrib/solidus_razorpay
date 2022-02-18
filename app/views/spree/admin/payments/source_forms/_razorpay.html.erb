@@ -1,1 +1,1 @@
-<%= render 'spree/shared/razorpay', frontend: false %>
+<%= render 'spree/shared/razorpay', frontend: false, success_callback_path: "/admin/orders/#{@order.number}/confirm" %>

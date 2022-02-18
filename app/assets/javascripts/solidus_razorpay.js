@@ -13,6 +13,7 @@ let rzpButton;
 let orderToken;
 let currency;
 let frontend;
+let successCallbackPath;
 
 const paymentFailed = (response) => {
   alert(response.error.code);
@@ -25,7 +26,7 @@ const paymentFailed = (response) => {
 };
 
 const setPaymentMethod = () => {
-  if (frontend) {
+  if (frontend === 'true') {
     paymentMethodId = document.querySelector('[name="order[payments_attributes][][payment_method_id]"]:checked').value
   } else {
     paymentMethodId = document.querySelector('[name="payment[payment_method_id]"]:checked').value
@@ -101,7 +102,8 @@ document.addEventListener('DOMContentLoaded', () => {
     contactNumber = rzpButton.dataset.contactNumber;
     orderToken = rzpButton.dataset.orderToken;
     orderId = rzpButton.dataset.orderId;
-    frontend = rzpButton.dataset.frontend
+    frontend = rzpButton.dataset.frontend;
+    successCallbackPath = rzpButton.dataset.successCallbackPath;
 
     options = {
       "key": '',
@@ -114,7 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
           await paymentSuccess(response);
           await advanceOrder();
           if (frontend) {
-            window.location.href = '/checkout/confirm';
+            window.location.href = successCallbackPath;
           }
       },
       "prefill": {
