@@ -17,8 +17,7 @@ module SolidusRazorpay
         SolidusRazorpay::RazorpayPayment,
         'razorpay_credentials', {
           razorpay_key: ENV['RAZORPAY_KEY'],
-          razorpay_secret: ENV['RAZORPAY_SECRET'],
-          razorpay_test_environment: ENV['RAZORPAY_TEST_ENV'],
+          razorpay_secret: ENV['RAZORPAY_SECRET']
         }
       )
       Spree::PermittedAttributes.source_attributes.concat [
