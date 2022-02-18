@@ -2,8 +2,7 @@
 
 module SolidusRazorpay
   class Configuration
-    # Define here the settings for this extension, e.g.:
-    attr_accessor :razorpay_key, :razorpay_secret, :razorpay_test_environment
+    attr_accessor :razorpay_key, :razorpay_secret
   end
 
   class << self
