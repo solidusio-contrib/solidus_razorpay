@@ -21,9 +21,19 @@ bin/rails generate solidus_razorpay:install
 
 ## Usage
 
-<!-- Explain how to use your extension once it's been installed. -->
+You have to go through the following steps to start using this extension to accept payments for your store.
+1. Go to the admin side of solidus and create a new payment method
+2. Select the `Razorpay payment` option in the Type field.
+3. Give the Payment Method a name and description and save it.
+4. You should get the following options
+![PaymentMethodConfiguration](docs/payment_method_configuration.png)
+5. Fill in the Key and Secret you got from your Razorpay account, also set the auto capture value to what is set for your razorpay account.
+6. That's it, this should allow the option of paying through Razorpay to show up for your orders.
 
-## Development
+#### Alternatively
+1. While creating the Payment Method you can select the `razorpay_credentials` option in the Preference Source field.
+2. This allows the Payment Method to use the environment variables `RAZORPAY_KEY` and `RAZORPAY_SECRET` to set the key and secret for the Payment Method.
+3. This would allow option of paying through Razorpay to show up for your orders.
 
 ### Testing the extension
 
