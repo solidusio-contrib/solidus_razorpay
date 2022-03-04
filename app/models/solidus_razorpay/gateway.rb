@@ -64,6 +64,10 @@ module SolidusRazorpay
       Razorpay::Order.create(amount: amount, currency: currency, receipt: receipt)
     end
 
+    def retrieve_order(order_id)
+      Razorpay::Order.fetch(order_id)
+    end
+
     def retrieve_payment(payment_id)
       Razorpay::Payment.fetch(payment_id)
     end
