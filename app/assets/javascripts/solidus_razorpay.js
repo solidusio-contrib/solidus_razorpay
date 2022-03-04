@@ -123,9 +123,6 @@ document.addEventListener('DOMContentLoaded', () => {
           "name": name,
           "email": email,
       },
-      "theme": {
-          "color": 'red'
-      },
     };
 
     rzpButton.onclick = async function(e) {
