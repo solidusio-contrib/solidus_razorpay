@@ -194,6 +194,16 @@ RSpec.describe SolidusRazorpay::Gateway, type: :model do
     end
   end
 
+  describe '#retrieve_order' do
+    before do
+      allow(Razorpay::Order).to receive(:fetch) { razorpay_order }
+    end
+
+    it 'creates a razorpay order' do
+      expect(gateway.retrieve_order(razorpay_order.id)).to eq razorpay_order
+    end
+  end
+
   describe '#retrieve_payment' do
     subject(:retrieved_payment) { gateway.retrieve_payment('pay_IfyJVYHeAaL6AY') }
 
