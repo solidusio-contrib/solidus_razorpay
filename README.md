@@ -7,13 +7,17 @@
 
 ## Installation
 
-Add solidus_razorpay to your Gemfile:
-
-```ruby
-gem 'solidus_razorpay'
+#### Add solidus_razorpay to your Gemfile:
+You can either directly add this line to your Gemfile
+```rb
+gem 'solidus_razorpay', git: 'https://github.com/solidusio-contrib/solidus_razorpay'
 ```
-
-Bundle your dependencies and run the installation generator:
+#### OR
+You can use the following command
+```shell
+bundle add solidus_razorpay --source https://github.com/solidusio-contrib/solidus_razorpay
+```
+#### Bundle your dependencies and run the installation generator:
 
 ```shell
 bin/rails generate solidus_razorpay:install
